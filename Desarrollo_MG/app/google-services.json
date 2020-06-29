@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "591469869937",
+    "firebase_url": "https://movigas-7834c.firebaseio.com",
+    "project_id": "movigas-7834c",
+    "storage_bucket": "movigas-7834c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:591469869937:android:5dbf6f649f829363c394d0",
+        "android_client_info": {
+          "package_name": "com.pm.pi_mg"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "591469869937-lnfuvd998gnp0plre5mstp8l9gfousib.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.pm.pi_mg",
+            "certificate_hash": "7334b29a464b65904bd81079ef9ad3ac46dd86f2"
+          }
+        },
+        {
+          "client_id": "591469869937-l6h27so2r4ttsdp57tu92c5rgokoruv4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDTgPkQAzfXr2IpbrTD3Yom5idewwq2IZU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "591469869937-l6h27so2r4ttsdp57tu92c5rgokoruv4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
