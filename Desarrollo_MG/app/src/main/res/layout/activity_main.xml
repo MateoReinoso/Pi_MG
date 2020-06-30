@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
+    android:background="@color/colorAccent"
     tools:context=".MainActivity">
 
     <LinearLayout
@@ -15,7 +16,45 @@
         <ImageView
             android:layout_width="150dp"
             android:layout_height="150dp"
-            android:src="@drawable/carro2"/>
+            android:src="@drawable/carro2"
+            android:layout_marginTop="50dp"
+            android:layout_gravity="center"/>
+        
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Movi Gas"
+            android:textAlignment="center"
+            android:textColor="@color/colorWhite"
+            android:layout_margin="40dp"
+            android:textSize="55sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:gravity="bottom"
+            android:layout_margin="30dp"
+            >
+            <Button
+                android:layout_width="3dp"
+                android:layout_weight="2"
+                android:background="@color/colorBlue"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="5dp"
+                android:textStyle="normal"
+                android:textColor="@color/colorWhite"
+                android:text="Conductor"/>
+            <Button
+                android:layout_width="3dp"
+                android:layout_weight="2"
+                android:background="@color/colorWhite"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:textStyle="normal"
+                android:text="Cliente"/>
+        </LinearLayout>
 
     </LinearLayout>
 
