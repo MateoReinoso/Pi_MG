@@ -26,6 +26,13 @@ public class MainActivity extends AppCompatActivity {
                 goToSelectAuth();
             }
         });
+
+        mButtonIAmDriver.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                goToSelectAuth();
+            }
+        });
     }
 
     private void goToSelectAuth() {
