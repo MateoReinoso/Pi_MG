@@ -64,6 +64,12 @@ public class LoginActivity extends AppCompatActivity {
                     }
                 });
             }
+            else{
+                Toast.makeText(this, "Contraseña debe ser mas de 6 caracteres", Toast.LENGTH_SHORT).show();
+            }
+        }
+        else{
+            Toast.makeText(this, "Email y Contraseña obligatorios", Toast.LENGTH_SHORT).show();
         }
     }
 }
