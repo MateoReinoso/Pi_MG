@@ -12,6 +12,7 @@ public class SelectOptionAuthActivity extends AppCompatActivity {
 
     Toolbar mToolbar;
     Button mButtonGoToLogin;
+    Button mButtonGoToRegister;
 
 
     @Override
@@ -20,20 +21,32 @@ public class SelectOptionAuthActivity extends AppCompatActivity {
         setContentView(R.layout.activity_select_option_auth);
         mToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setTitle("Seleccionar opcion");
+        getSupportActionBar().setTitle("Seleccionar opción");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mButtonGoToLogin = findViewById(R.id.btnGoToLogin);
+        mButtonGoToRegister = findViewById(R.id.btnGoToRegister);
         mButtonGoToLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 goToLogin();
             }
         });
+        mButtonGoToRegister.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                goToRegister();
+            }
+        });
     }
 
     public void goToLogin() {
         Intent intent = new Intent(SelectOptionAuthActivity.this, LoginActivity.class);
+        startActivity(intent);
+    }
+
+    public void goToRegister() {
+        Intent intent = new Intent(SelectOptionAuthActivity.this, RegisterActivity.class);
         startActivity(intent);
     }
 }
