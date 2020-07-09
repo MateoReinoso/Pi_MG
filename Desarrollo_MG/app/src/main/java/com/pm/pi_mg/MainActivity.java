@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
         mButtonIAmClient.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                editor.putString("user", "Cliente");
+                editor.putString("user", "client");
                 editor.apply();
                 goToSelectAuth();
             }
@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
         mButtonIAmDriver.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                editor.putString("user", "Conductor");
+                editor.putString("user", "driver");
                 editor.apply();
                 goToSelectAuth();
             }

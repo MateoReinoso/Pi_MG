@@ -78,7 +78,7 @@ public class RegisterActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if(task.isSuccessful()){
                             saveUser(name, email);
-                            Toast.makeText(RegisterActivity.this, "Registro Exitoso..", Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(RegisterActivity.this, "Registro Exitoso..x", Toast.LENGTH_SHORT).show();
                         }else{
                             Toast.makeText(RegisterActivity.this, "No se pudo registrar su usuario", Toast.LENGTH_SHORT).show();
                         }
