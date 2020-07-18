@@ -46,7 +46,7 @@
                 android:layout_marginRight="5dp"
                 android:textStyle="normal"
                 android:textColor="@color/colorWhite"
-                android:text="Conductor"
+                android:text="Repartidor"
                 android:backgroundTint="@color/colorBlue"/>
             <Button
                 android:id="@+id/btnIAmClient"

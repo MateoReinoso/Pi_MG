@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.app.AlertDialog;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
@@ -17,15 +18,19 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.pm.pi_mg.includes.MyToolbar;
 import com.pm.pi_mg.models.User;
+
+import dmax.dialog.SpotsDialog;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    Toolbar mToolbar;
     SharedPreferences mPref;
 
     FirebaseAuth mAuth;
     DatabaseReference mDatabase;
+
+    AlertDialog mDialog;
 
     //instanciar vistas
     Button mButtonRegister;
@@ -39,17 +44,17 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
+        MyToolbar.show(this, "Registro de Usuario", true);
+
         mAuth = FirebaseAuth.getInstance();
 
         //referencia al nodo principal de la base de datos creado en firebase
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
-        mToolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(mToolbar);
-        getSupportActionBar().setTitle("Seleccionar opción");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
 
         mPref = getApplicationContext().getSharedPreferences("typeUser", MODE_PRIVATE);
+        mDialog = new SpotsDialog.Builder().setContext(RegisterActivity.this).setMessage("Cargando..").build();
 
         //Toast.makeText(this, "Opción seleccionada es: "+ selectedUser, Toast.LENGTH_SHORT).show();
         mButtonRegister = findViewById(R.id.btnRegister);
@@ -73,12 +78,14 @@ public class RegisterActivity extends AppCompatActivity {
 
         if(!name.isEmpty() && !email.isEmpty() && !password.isEmpty()){
             if(password.length() >= 6){
+                mDialog.show();
                 mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
+                        mDialog.hide();
                         if(task.isSuccessful()){
-                            saveUser(name, email);
-                            //Toast.makeText(RegisterActivity.this, "Registro Exitoso..x", Toast.LENGTH_SHORT).show();
+                            String id = mAuth.getCurrentUser().getUid();
+                            saveUser(id, name, email);
                         }else{
                             Toast.makeText(RegisterActivity.this, "No se pudo registrar su usuario", Toast.LENGTH_SHORT).show();
                         }
@@ -94,7 +101,7 @@ public class RegisterActivity extends AppCompatActivity {
         }
     }
 
-    void saveUser(String name, String email) {
+    void saveUser(String id, String name, String email) {
         String selectedUser = mPref.getString("user", "");
 
         User user = new User();
@@ -104,7 +111,7 @@ public class RegisterActivity extends AppCompatActivity {
         if(selectedUser.equals("driver")){
             //creacion de nodo hijo dentro de la base de datos
             //push nos sirve para crear com el identificador en base de datos relacional
-            mDatabase.child("Users").child("Drivers").push().setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+            mDatabase.child("Users").child("Drivers").child(id).setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     if(task.isSuccessful()){
@@ -116,7 +123,7 @@ public class RegisterActivity extends AppCompatActivity {
             });
         }
         else if(selectedUser.equals("client")){
-            mDatabase.child("Users").child("Clients").push().setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+            mDatabase.child("Users").child("Clients").child(id).setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     if(task.isSuccessful()){

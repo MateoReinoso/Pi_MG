@@ -8,9 +8,10 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+import com.pm.pi_mg.includes.MyToolbar;
+
 public class SelectOptionAuthActivity extends AppCompatActivity {
 
-    Toolbar mToolbar;
     Button mButtonGoToLogin;
     Button mButtonGoToRegister;
 
@@ -19,10 +20,8 @@ public class SelectOptionAuthActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_option_auth);
-        mToolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(mToolbar);
-        getSupportActionBar().setTitle("Seleccionar opción");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        MyToolbar.show(this, "Seleccionar Opción", true);
 
         mButtonGoToLogin = findViewById(R.id.btnGoToLogin);
         mButtonGoToRegister = findViewById(R.id.btnGoToRegister);
