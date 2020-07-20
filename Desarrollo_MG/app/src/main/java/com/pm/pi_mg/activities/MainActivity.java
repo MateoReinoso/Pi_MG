@@ -1,4 +1,4 @@
-package com.pm.pi_mg;
+package com.pm.pi_mg.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -7,6 +7,8 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+
+import com.pm.pi_mg.R;
 
 public class MainActivity extends AppCompatActivity {
 

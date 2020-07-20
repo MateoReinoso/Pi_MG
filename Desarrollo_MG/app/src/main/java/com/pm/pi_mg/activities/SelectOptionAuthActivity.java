@@ -1,19 +1,23 @@
-package com.pm.pi_mg;
+package com.pm.pi_mg.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+import com.pm.pi_mg.R;
+import com.pm.pi_mg.activities.client.RegisterActivity;
+import com.pm.pi_mg.activities.driver.RegisterDriverActivity;
 import com.pm.pi_mg.includes.MyToolbar;
 
 public class SelectOptionAuthActivity extends AppCompatActivity {
 
     Button mButtonGoToLogin;
     Button mButtonGoToRegister;
+    SharedPreferences mPref;
 
 
     @Override
@@ -37,6 +41,8 @@ public class SelectOptionAuthActivity extends AppCompatActivity {
                 goToRegister();
             }
         });
+
+        mPref = getApplicationContext().getSharedPreferences("typeUser", MODE_PRIVATE);
     }
 
     public void goToLogin() {
@@ -45,7 +51,14 @@ public class SelectOptionAuthActivity extends AppCompatActivity {
     }
 
     public void goToRegister() {
-        Intent intent = new Intent(SelectOptionAuthActivity.this, RegisterActivity.class);
-        startActivity(intent);
+        String typeUser = mPref.getString("user", "");
+        if(typeUser.equals("client")){
+            Intent intent = new Intent(SelectOptionAuthActivity.this, RegisterActivity.class);
+            startActivity(intent);
+        }else{
+            Intent intent = new Intent(SelectOptionAuthActivity.this, RegisterDriverActivity.class);
+            startActivity(intent);
+        }
+
     }
 }

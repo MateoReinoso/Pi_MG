@@ -1,8 +1,7 @@
-package com.pm.pi_mg;
+package com.pm.pi_mg.activities.client;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 
 import android.app.AlertDialog;
 import android.content.SharedPreferences;
@@ -16,19 +15,15 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+import com.pm.pi_mg.R;
 import com.pm.pi_mg.includes.MyToolbar;
 import com.pm.pi_mg.models.Client;
-import com.pm.pi_mg.models.User;
 import com.pm.pi_mg.providers.AuthProvider;
 import com.pm.pi_mg.providers.ClientProvider;
 
 import dmax.dialog.SpotsDialog;
 
 public class RegisterActivity extends AppCompatActivity {
-
-    SharedPreferences mPref;
 
     AuthProvider mAuthProvider;
     ClientProvider mClientProvider;
@@ -47,12 +42,11 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        MyToolbar.show(this, "Registro de Usuario", true);
+        MyToolbar.show(this, "Registro de Cliente", true);
 
         mAuthProvider = new AuthProvider();
         mClientProvider = new ClientProvider();
 
-        mPref = getApplicationContext().getSharedPreferences("typeUser", MODE_PRIVATE);
         mDialog = new SpotsDialog.Builder().setContext(RegisterActivity.this).setMessage("Cargando..").build();
 
         //Toast.makeText(this, "Opción seleccionada es: "+ selectedUser, Toast.LENGTH_SHORT).show();
