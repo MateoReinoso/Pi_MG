@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
@@ -16,6 +17,8 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.pm.pi_mg.R;
+import com.pm.pi_mg.activities.driver.MapDriverActivity;
+import com.pm.pi_mg.activities.driver.RegisterDriverActivity;
 import com.pm.pi_mg.includes.MyToolbar;
 import com.pm.pi_mg.models.Client;
 import com.pm.pi_mg.providers.AuthProvider;
@@ -104,7 +107,9 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if(task.isSuccessful()){
-                    Toast.makeText(RegisterActivity.this, "Registro exitoso.", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(RegisterActivity.this, MapClientActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
                 }else{
                     Toast.makeText(RegisterActivity.this, "No se pudo crear su registro.", Toast.LENGTH_SHORT).show();
                 }
