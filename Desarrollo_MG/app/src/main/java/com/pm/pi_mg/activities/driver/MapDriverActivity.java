@@ -23,6 +23,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -38,17 +39,20 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.auth.FirebaseAuth;
 import com.pm.pi_mg.R;
 import com.pm.pi_mg.activities.MainActivity;
 import com.pm.pi_mg.activities.client.MapClientActivity;
 import com.pm.pi_mg.includes.MyToolbar;
 import com.pm.pi_mg.providers.AuthProvider;
+import com.pm.pi_mg.providers.GeofireProvider;
 
 public class MapDriverActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private SupportMapFragment mMapFragment;
     private AuthProvider mAuthProvider;
+    private GeofireProvider mGeofireProvider;
 
     private LocationRequest mLocationRequest;
     private FusedLocationProviderClient mFusedLocation;
@@ -62,12 +66,16 @@ public class MapDriverActivity extends AppCompatActivity implements OnMapReadyCa
 
     private boolean mIsConnect = false;
 
+    private LatLng mCurrentLatLng;
+
 
     LocationCallback mLocationCallback = new LocationCallback() {
         @Override
         public void onLocationResult(LocationResult locationResult) {
             for (Location location : locationResult.getLocations()) {
                 if (getApplicationContext() != null) {
+
+                    mCurrentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
 
                     if (mMarker != null) {
                         mMarker.remove();
@@ -85,6 +93,9 @@ public class MapDriverActivity extends AppCompatActivity implements OnMapReadyCa
                                     .zoom(16f)
                                     .build()
                     ));
+
+                    updateLocation();
+
                 }
             }
         }
@@ -97,6 +108,8 @@ public class MapDriverActivity extends AppCompatActivity implements OnMapReadyCa
         MyToolbar.show(this, "Repartidor", false);
 
         mAuthProvider = new AuthProvider();
+
+        mGeofireProvider = new GeofireProvider();
 
         mFusedLocation = LocationServices.getFusedLocationProviderClient(this);
 
@@ -118,6 +131,14 @@ public class MapDriverActivity extends AppCompatActivity implements OnMapReadyCa
     }
 
 
+    private void updateLocation(){
+        if (mAuthProvider.existSession() && mCurrentLatLng != null){
+            mGeofireProvider.saveLocation(mAuthProvider.getId(), mCurrentLatLng);
+        }
+
+    }
+
+
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -136,7 +157,6 @@ public class MapDriverActivity extends AppCompatActivity implements OnMapReadyCa
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         mLocationRequest.setSmallestDisplacement(5);
 
-        startLocation();
     }
 
     @Override
@@ -195,10 +215,17 @@ public class MapDriverActivity extends AppCompatActivity implements OnMapReadyCa
     }
 
     private void disconnect(){
-        mButtonConnect.setText("Conectarse");
-        mIsConnect = false;
+
         if (mFusedLocation != null){
+            mButtonConnect.setText("Conectarse");
+            mIsConnect = false;
             mFusedLocation.removeLocationUpdates(mLocationCallback);
+            if (mAuthProvider.existSession()) {
+                mGeofireProvider.removeLocation(mAuthProvider.getId());
+            }
+        }
+        else {
+            Toast.makeText(this, "No te puedes desconectar", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -266,6 +293,7 @@ public class MapDriverActivity extends AppCompatActivity implements OnMapReadyCa
     }
 
     void logout(){
+        disconnect();
         mAuthProvider.logout();
         Intent intent = new Intent(MapDriverActivity.this, MainActivity.class);
         startActivity(intent);
