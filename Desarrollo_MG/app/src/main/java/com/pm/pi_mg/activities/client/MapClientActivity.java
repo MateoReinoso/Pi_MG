@@ -23,6 +23,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
+import com.firebase.geofire.GeoLocation;
+import com.firebase.geofire.GeoQueryEventListener;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -37,11 +39,16 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.database.DatabaseError;
 import com.pm.pi_mg.R;
 import com.pm.pi_mg.activities.MainActivity;
 import com.pm.pi_mg.activities.driver.MapDriverActivity;
 import com.pm.pi_mg.includes.MyToolbar;
 import com.pm.pi_mg.providers.AuthProvider;
+import com.pm.pi_mg.providers.GeofireProvider;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MapClientActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -52,10 +59,18 @@ public class MapClientActivity extends AppCompatActivity implements OnMapReadyCa
     private LocationRequest mLocationRequest;
     private FusedLocationProviderClient mFusedLocation;
 
+    private GeofireProvider mGeofireProvider;
+
     private final static int LOCATION_REQUEST_CODE = 1;
     private final static int SETTINGS_REQUEST_CODE = 2;
 
     private Marker mMarker;
+
+    private LatLng mCurrentLatLng;
+
+    private List<Marker> mDriversMarkers = new ArrayList<>();
+
+    private boolean mIsFirstTime = true;
 
 
     LocationCallback mLocationCallback = new LocationCallback() {
@@ -67,6 +82,8 @@ public class MapClientActivity extends AppCompatActivity implements OnMapReadyCa
                     if (mMarker != null) {
                         mMarker.remove();
                     }
+
+                    mCurrentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
 
                     mMarker= mMap.addMarker(new MarkerOptions().position(
                             new LatLng(location.getLatitude(), location.getLongitude())
@@ -81,6 +98,11 @@ public class MapClientActivity extends AppCompatActivity implements OnMapReadyCa
                                     .zoom(15f)
                                     .build()
                     ));
+
+                    if (mIsFirstTime) {
+                        mIsFirstTime = false;
+                        getActiveDrivers();
+                    }
                 }
             }
         }
@@ -93,6 +115,7 @@ public class MapClientActivity extends AppCompatActivity implements OnMapReadyCa
         MyToolbar.show(this, "Cliente", false);
 
         mAuthProvider = new AuthProvider();
+        mGeofireProvider = new GeofireProvider();
 
         mFusedLocation = LocationServices.getFusedLocationProviderClient(this);
 
@@ -100,7 +123,61 @@ public class MapClientActivity extends AppCompatActivity implements OnMapReadyCa
         mMapFragment.getMapAsync(this);
     }
 
-    
+    private void getActiveDrivers(){
+        mGeofireProvider.getActiveDrivers(mCurrentLatLng).addGeoQueryEventListener(new GeoQueryEventListener() {
+            @Override
+            //en este añadiremos los marcadores de los conductores
+            public void onKeyEntered(String key, GeoLocation location) {
+                for (Marker marker: mDriversMarkers){
+                    if (marker.getTag() != null){
+                        if (marker.getTag().equals(key)){
+                            return;
+                        }
+                    }
+                }
+                LatLng driverLatLng = new LatLng(location.latitude, location.longitude);
+                Marker marker = mMap.addMarker(new MarkerOptions().position(driverLatLng).title("Conductor Disponible").icon(BitmapDescriptorFactory.fromResource(R.drawable.icons8_cami_n_30)));
+                marker.setTag(key);
+                mDriversMarkers.add(marker);
+            }
+
+            @Override
+            //eliminar los marcadores que se desconectan de la aplicacion
+            public void onKeyExited(String key) {
+                for (Marker marker: mDriversMarkers){
+                    if (marker.getTag() != null){
+                        if (marker.getTag().equals(key)){
+                            marker.remove();
+                            mDriversMarkers.remove(marker);
+                            return;
+                        }
+                    }
+                }
+            }
+
+            @Override
+            //actualizando en tiempo real
+            public void onKeyMoved(String key, GeoLocation location) {
+                for (Marker marker: mDriversMarkers){
+                    if (marker.getTag() != null){
+                        if (marker.getTag().equals(key)){
+                            marker.setPosition(new LatLng(location.latitude, location.longitude));
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onGeoQueryReady() {
+
+            }
+
+            @Override
+            public void onGeoQueryError(DatabaseError error) {
+
+            }
+        });
+    }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
