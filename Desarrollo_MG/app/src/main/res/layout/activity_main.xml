@@ -23,7 +23,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Movi Gas"
+            android:text="Mov Gas"
             android:textAlignment="center"
             android:textColor="@color/colorWhite"
             android:layout_margin="40dp"
