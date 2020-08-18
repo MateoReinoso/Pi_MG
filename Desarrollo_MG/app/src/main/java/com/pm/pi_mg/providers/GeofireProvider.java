@@ -24,7 +24,7 @@ public class GeofireProvider {
     public void removeLocation(String idDriver){mGeofire.removeLocation(idDriver);}
 
     public GeoQuery getActiveDrivers(LatLng latLng){
-        GeoQuery geoQuery = mGeofire.queryAtLocation(new GeoLocation(latLng.latitude, latLng.longitude), 6);
+        GeoQuery geoQuery = mGeofire.queryAtLocation(new GeoLocation(latLng.latitude, latLng.longitude), 3);
         geoQuery.removeAllListeners();
         return geoQuery;
     }
