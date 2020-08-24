@@ -79,6 +79,7 @@
         android:textColor="@color/colorWhite"
         android:layout_gravity="bottom"
         android:layout_margin="20dp"
+        android:text="Seleccionar Entrega"
         />
 
 
