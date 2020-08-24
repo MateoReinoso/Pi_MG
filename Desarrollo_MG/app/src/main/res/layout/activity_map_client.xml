@@ -70,7 +70,16 @@
         android:layout_gravity="center"
         />
 
-
+    <Button
+        android:id="@+id/btnRequestDriver"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rounded_button"
+        android:backgroundTint="@color/colorPrimaryDark"
+        android:textColor="@color/colorWhite"
+        android:layout_gravity="bottom"
+        android:layout_margin="20dp"
+        />
 
 
 

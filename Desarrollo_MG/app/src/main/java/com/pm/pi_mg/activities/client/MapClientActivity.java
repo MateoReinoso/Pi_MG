@@ -25,6 +25,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQueryEventListener;
@@ -97,6 +98,8 @@ public class MapClientActivity extends AppCompatActivity implements OnMapReadyCa
     private String mDestination;
     private LatLng mDestinationLatLng;
 
+    private Button mButtonRequestDriver;
+
 
     LocationCallback mLocationCallback = new LocationCallback() {
         @Override
@@ -148,6 +151,7 @@ public class MapClientActivity extends AppCompatActivity implements OnMapReadyCa
         mMapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mMapFragment.getMapAsync(this);
 
+        mButtonRequestDriver = findViewById(R.id.btnRequestDriver);
         if (!Places.isInitialized()) {
             Places.initialize(getApplicationContext(), getResources().getString(R.string.google_maps_key));
         }
@@ -157,16 +161,39 @@ public class MapClientActivity extends AppCompatActivity implements OnMapReadyCa
         instanceAutoCompleteDestination();
         onCameraMove();
 
+        mButtonRequestDriver.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                requestDriver();
+            }
+        });
+
     }
 
-    private void limitSearch(){
+    private void requestDriver() {
+        if (mOriginLatLng != null && mDestinationLatLng != null) {
+            Intent intent = new Intent(MapClientActivity.this, DetailRequestActivity.class);
+            intent.putExtra("origin_lat", mOriginLatLng.latitude);
+            intent.putExtra("origin_lng", mOriginLatLng.longitude);
+            intent.putExtra("destination_lat", mDestinationLatLng.latitude);
+            intent.putExtra("destination_lng", mDestinationLatLng.longitude);
+            startActivity(intent);
+        } else {
+            Toast.makeText(this, "Debe seleccionar el lugar de recogida y destino", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void limitSearch() {
         LatLng northSide = SphericalUtil.computeOffset(mCurrentLatLng, 5000, 0);
         LatLng southSide = SphericalUtil.computeOffset(mCurrentLatLng, 5000, 180);
         mAutocomplete.setCountry("ECU");
         mAutocomplete.setLocationBias(RectangularBounds.newInstance(southSide, northSide));
+        mAutocompleteDestination.setCountry("ECU");
+        mAutocompleteDestination.setLocationBias(RectangularBounds.newInstance(southSide, northSide));
+
     }
 
-    private void onCameraMove(){
+    private void onCameraMove() {
         mCameraListener = new GoogleMap.OnCameraIdleListener() {
             @Override
             public void onCameraIdle() {
@@ -179,14 +206,14 @@ public class MapClientActivity extends AppCompatActivity implements OnMapReadyCa
                     String address = addressList.get(0).getAddressLine(0);
                     mOrigin = address + " " + city;
                     mAutocomplete.setText(address + " " + city);
-                }catch (Exception e){
+                } catch (Exception e) {
                     Log.d("Error:", "Mensaje error" + e.getMessage());
                 }
             }
         };
     }
 
-    private void instanceAutoCompleteOrigin(){
+    private void instanceAutoCompleteOrigin() {
         mAutocomplete = (AutocompleteSupportFragment) getSupportFragmentManager().findFragmentById(R.id.placeAutocompleteOrigin);
         mAutocomplete.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.LAT_LNG, Place.Field.NAME));
         mAutocomplete.setHint("Lugar de recogida");
@@ -208,7 +235,7 @@ public class MapClientActivity extends AppCompatActivity implements OnMapReadyCa
         });
     }
 
-    private void instanceAutoCompleteDestination(){
+    private void instanceAutoCompleteDestination() {
         mAutocompleteDestination = (AutocompleteSupportFragment) getSupportFragmentManager().findFragmentById(R.id.placeAutocompleteDestination);
         mAutocompleteDestination.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.LAT_LNG, Place.Field.NAME));
         mAutocompleteDestination.setHint("Destino");
@@ -292,7 +319,10 @@ public class MapClientActivity extends AppCompatActivity implements OnMapReadyCa
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         mMap.getUiSettings().setZoomControlsEnabled(true);
-
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        mMap.setMyLocationEnabled(true);
         mMap.setOnCameraIdleListener(mCameraListener);
 
         mLocationRequest = new LocationRequest();
