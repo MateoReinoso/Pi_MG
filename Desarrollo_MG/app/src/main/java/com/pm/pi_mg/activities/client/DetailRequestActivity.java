@@ -5,7 +5,9 @@ import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -13,10 +15,24 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.JointType;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.maps.model.SquareCap;
 import com.pm.pi_mg.R;
 import com.pm.pi_mg.includes.MyToolbar;
+import com.pm.pi_mg.providers.GoogleApiProvider;
+import com.pm.pi_mg.utils.DecodePoints;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class DetailRequestActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -30,6 +46,11 @@ public class DetailRequestActivity extends AppCompatActivity implements OnMapRea
 
     private LatLng mOriginLatLng;
     private LatLng mDestinationLatLng;
+
+    private GoogleApiProvider mGoogleApiProvider;
+
+    private List<LatLng> mPolylineList;
+    private PolylineOptions mPolylineOptions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +68,40 @@ public class DetailRequestActivity extends AppCompatActivity implements OnMapRea
         mOriginLatLng = new LatLng(mExtraOriginLat,mExtraOriginLng);
         mDestinationLatLng = new LatLng(mExtraDestinationLat, mExtraDestinationLng);
 
+        mGoogleApiProvider = new GoogleApiProvider(DetailRequestActivity.this);
+
+    }
+
+    private void drawRoute(){
+        mGoogleApiProvider.getDirections(mOriginLatLng, mDestinationLatLng).enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                try {
+
+                    JSONObject jsonObject = new JSONObject(response.body());
+                    JSONArray jsonArray = jsonObject.getJSONArray("routes");
+                    JSONObject route = jsonArray.getJSONObject(0);
+                    JSONObject polylines = route.getJSONObject("overview_polyline");
+                    String points = polylines.getString("points");
+                    mPolylineList = DecodePoints.decodePoly(points);
+                    mPolylineOptions = new PolylineOptions();
+                    mPolylineOptions.color(Color.DKGRAY);
+                    mPolylineOptions.width(8f);
+                    mPolylineOptions.startCap(new SquareCap());
+                    mPolylineOptions.jointType(JointType.ROUND);
+                    mPolylineOptions.addAll(mPolylineList);
+                    mMap.addPolyline(mPolylineOptions);
+
+                }catch (Exception e){
+                    Log.d("Error", "Error encontrado" + e.getMessage());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+
+            }
+        });
     }
 
     @Override
@@ -64,6 +119,8 @@ public class DetailRequestActivity extends AppCompatActivity implements OnMapRea
                 .zoom(13f)
                 .build()
         ));
+
+        drawRoute();
 
     }
 }
