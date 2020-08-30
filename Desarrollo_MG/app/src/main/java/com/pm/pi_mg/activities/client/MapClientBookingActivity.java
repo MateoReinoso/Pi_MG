@@ -91,9 +91,7 @@ public class MapClientBookingActivity extends AppCompatActivity implements OnMap
         mTokenProvider = new TokenProvider();
         mClientBookingProvider = new ClientBookingProvider();
         mGoogleApiProvider = new GoogleApiProvider(MapClientBookingActivity.this);
-        mTextViewClientBooking = findViewById(R.id.textViewDriverBooking);
-        mTextViewEmailClientBooking = findViewById(R.id.textViewEmailDriverBooking);
-        mTextViewDestinationClientBooking = findViewById(R.id.textViewDestinationDriverBooking);
+
         mMapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mMapFragment.getMapAsync(this);
 
@@ -101,11 +99,10 @@ public class MapClientBookingActivity extends AppCompatActivity implements OnMap
             Places.initialize(getApplicationContext(), getResources().getString(R.string.google_maps_key));
         }
 
-
-
         mTextViewClientBooking = findViewById(R.id.textViewDriverBooking);
         mTextViewEmailClientBooking = findViewById(R.id.textViewEmailDriverBooking);
-        mTextViewDestinationClientBooking = findViewById(R.id.textViewDestinationClientBooking);
+        mTextViewDestinationClientBooking = findViewById(R.id.textViewDestinationDriverBooking);
+
         getClientBooking();
     }
 
