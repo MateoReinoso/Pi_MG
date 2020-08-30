@@ -46,6 +46,7 @@ import com.pm.pi_mg.activities.client.MapClientActivity;
 import com.pm.pi_mg.includes.MyToolbar;
 import com.pm.pi_mg.providers.AuthProvider;
 import com.pm.pi_mg.providers.GeofireProvider;
+import com.pm.pi_mg.providers.TokenProvider;
 
 public class MapDriverActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -53,6 +54,8 @@ public class MapDriverActivity extends AppCompatActivity implements OnMapReadyCa
     private SupportMapFragment mMapFragment;
     private AuthProvider mAuthProvider;
     private GeofireProvider mGeofireProvider;
+    private TokenProvider mTokenProvider;
+
 
     private LocationRequest mLocationRequest;
     private FusedLocationProviderClient mFusedLocation;
@@ -110,6 +113,7 @@ public class MapDriverActivity extends AppCompatActivity implements OnMapReadyCa
         mAuthProvider = new AuthProvider();
 
         mGeofireProvider = new GeofireProvider();
+        mTokenProvider = new TokenProvider();
 
         mFusedLocation = LocationServices.getFusedLocationProviderClient(this);
 
@@ -128,8 +132,8 @@ public class MapDriverActivity extends AppCompatActivity implements OnMapReadyCa
                 }
             }
         });
+        generateToken();
     }
-
 
     private void updateLocation(){
         if (mAuthProvider.existSession() && mCurrentLatLng != null){
@@ -137,8 +141,6 @@ public class MapDriverActivity extends AppCompatActivity implements OnMapReadyCa
         }
 
     }
-
-
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -298,6 +300,10 @@ public class MapDriverActivity extends AppCompatActivity implements OnMapReadyCa
         Intent intent = new Intent(MapDriverActivity.this, MainActivity.class);
         startActivity(intent);
         finish();
+    }
+
+    void generateToken(){
+        mTokenProvider.create(mAuthProvider.getId());
     }
 
 }

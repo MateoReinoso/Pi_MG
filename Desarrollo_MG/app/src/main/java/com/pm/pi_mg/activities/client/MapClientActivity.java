@@ -58,6 +58,7 @@ import com.pm.pi_mg.activities.driver.MapDriverActivity;
 import com.pm.pi_mg.includes.MyToolbar;
 import com.pm.pi_mg.providers.AuthProvider;
 import com.pm.pi_mg.providers.GeofireProvider;
+import com.pm.pi_mg.providers.TokenProvider;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -73,6 +74,7 @@ public class MapClientActivity extends AppCompatActivity implements OnMapReadyCa
     private FusedLocationProviderClient mFusedLocation;
 
     private GeofireProvider mGeofireProvider;
+    private TokenProvider mTokenProvider;
 
     private final static int LOCATION_REQUEST_CODE = 1;
     private final static int SETTINGS_REQUEST_CODE = 2;
@@ -145,6 +147,7 @@ public class MapClientActivity extends AppCompatActivity implements OnMapReadyCa
 
         mAuthProvider = new AuthProvider();
         mGeofireProvider = new GeofireProvider();
+        mTokenProvider = new TokenProvider();
 
         mFusedLocation = LocationServices.getFusedLocationProviderClient(this);
 
@@ -167,6 +170,8 @@ public class MapClientActivity extends AppCompatActivity implements OnMapReadyCa
                 requestDriver();
             }
         });
+
+        generateToken();
 
     }
 
@@ -464,5 +469,9 @@ public class MapClientActivity extends AppCompatActivity implements OnMapReadyCa
         Intent intent = new Intent(MapClientActivity.this, MainActivity.class);
         startActivity(intent);
         finish();
+    }
+
+    void generateToken(){
+        mTokenProvider.create(mAuthProvider.getId());
     }
 }
