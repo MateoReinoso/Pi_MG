@@ -261,7 +261,7 @@ public class MapClientActivity extends AppCompatActivity implements OnMapReadyCa
 
 
     private void getActiveDrivers() {
-        mGeofireProvider.getActiveDrivers(mCurrentLatLng).addGeoQueryEventListener(new GeoQueryEventListener() {
+        mGeofireProvider.getActiveDrivers(mCurrentLatLng, 3).addGeoQueryEventListener(new GeoQueryEventListener() {
             @Override
             //en este añadiremos los marcadores de los conductores
             public void onKeyEntered(String key, GeoLocation location) {

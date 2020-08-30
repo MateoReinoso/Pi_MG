@@ -15,10 +15,10 @@
 
         <com.airbnb.lottie.LottieAnimationView
             android:id="@+id/animation"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
             app:lottie_imageAssetsFolder="assets"
-            app:lottie_fileName="11609-quickload.json"
+            app:lottie_fileName="11435-entrega.json"
             android:layout_gravity="center"
             app:lottie_loop="true"
             app:lottie_autoPlay="true"
