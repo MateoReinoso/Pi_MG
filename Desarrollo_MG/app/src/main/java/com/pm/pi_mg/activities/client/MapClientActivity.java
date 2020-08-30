@@ -146,7 +146,7 @@ public class MapClientActivity extends AppCompatActivity implements OnMapReadyCa
         MyToolbar.show(this, "Cliente", false);
 
         mAuthProvider = new AuthProvider();
-        mGeofireProvider = new GeofireProvider();
+        mGeofireProvider = new GeofireProvider("active_drivers");
         mTokenProvider = new TokenProvider();
 
         mFusedLocation = LocationServices.getFusedLocationProviderClient(this);
@@ -223,14 +223,14 @@ public class MapClientActivity extends AppCompatActivity implements OnMapReadyCa
     private void instanceAutoCompleteOrigin() {
         mAutocomplete = (AutocompleteSupportFragment) getSupportFragmentManager().findFragmentById(R.id.placeAutocompleteOrigin);
         mAutocomplete.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.LAT_LNG, Place.Field.NAME));
-        mAutocomplete.setHint("Lugar de recogida");
+        mAutocomplete.setHint("Origen");
         mAutocomplete.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(@NonNull Place place) {
-                mOrigin = place.getName();
+                //mOrigin = place.getName();
                 mOriginLatLng = place.getLatLng();
 
-                Log.d("PLACE", "Name: " + mOrigin);
+                //Log.d("PLACE", "Name: " + mOrigin);
                 Log.d("PLACE", "Lat: " + mOriginLatLng.latitude);
                 Log.d("PLACE", "Lng: " + mOriginLatLng.longitude);
             }

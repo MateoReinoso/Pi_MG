@@ -12,16 +12,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
 import android.provider.Settings;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -39,19 +35,12 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.ValueEventListener;
 import com.pm.pi_mg.R;
-import com.pm.pi_mg.activities.MainActivity;
-import com.pm.pi_mg.activities.client.MapClientActivity;
-import com.pm.pi_mg.includes.MyToolbar;
 import com.pm.pi_mg.providers.AuthProvider;
 import com.pm.pi_mg.providers.GeofireProvider;
 import com.pm.pi_mg.providers.TokenProvider;
 
-public class MapDriverActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MapDriverBookingActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private SupportMapFragment mMapFragment;
@@ -68,13 +57,7 @@ public class MapDriverActivity extends AppCompatActivity implements OnMapReadyCa
 
     private Marker mMarker;
 
-    private Button mButtonConnect;
-
-    private boolean mIsConnect = false;
-
     private LatLng mCurrentLatLng;
-
-    private ValueEventListener mListener;
 
 
     LocationCallback mLocationCallback = new LocationCallback() {
@@ -92,8 +75,8 @@ public class MapDriverActivity extends AppCompatActivity implements OnMapReadyCa
                     mMarker= mMap.addMarker(new MarkerOptions().position(
                             new LatLng(location.getLatitude(), location.getLongitude())
                             )
-                            .title("Tu posición")
-                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.icons8_cami_n_30))
+                                    .title("Tu posición")
+                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.icons8_cami_n_30))
                     );
                     mMap.moveCamera(CameraUpdateFactory.newCameraPosition(
                             new CameraPosition.Builder()
@@ -112,60 +95,17 @@ public class MapDriverActivity extends AppCompatActivity implements OnMapReadyCa
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_map_driver);
-        MyToolbar.show(this, "Repartidor", false);
-
+        setContentView(R.layout.activity_map_driver_booking);
         mAuthProvider = new AuthProvider();
 
-        mGeofireProvider = new GeofireProvider("active_drivers");
+        mGeofireProvider = new GeofireProvider("drivers_working");
         mTokenProvider = new TokenProvider();
 
         mFusedLocation = LocationServices.getFusedLocationProviderClient(this);
 
         mMapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mMapFragment.getMapAsync(this);
-
-        mButtonConnect = findViewById(R.id.btnConnect);
-        mButtonConnect.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (mIsConnect) {
-                    disconnect();
-                }
-                else {
-                    startLocation();
-                }
-            }
-        });
-        generateToken();
-        isDriverWorking();
-
     }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (mListener != null){
-            mGeofireProvider.isDriverWorking(mAuthProvider.getId()).removeEventListener(mListener);
-        }
-    }
-
-    private void isDriverWorking() {
-        mListener = mGeofireProvider.isDriverWorking(mAuthProvider.getId()).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()){
-                    disconnect();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-    }
-
     private void updateLocation(){
         if (mAuthProvider.existSession() && mCurrentLatLng != null){
             mGeofireProvider.saveLocation(mAuthProvider.getId(), mCurrentLatLng);
@@ -189,7 +129,7 @@ public class MapDriverActivity extends AppCompatActivity implements OnMapReadyCa
         mLocationRequest.setFastestInterval(1000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         mLocationRequest.setSmallestDisplacement(5);
-
+        startLocation();
     }
 
     @Override
@@ -229,12 +169,12 @@ public class MapDriverActivity extends AppCompatActivity implements OnMapReadyCa
     private void showAlertDialogNOGPS() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Por favor activa el GPS para continuar.")
-            .setPositiveButton("Configuraciones", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    startActivityForResult(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS), SETTINGS_REQUEST_CODE);
-                }
-            }).create().show();
+                .setPositiveButton("Configuraciones", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        startActivityForResult(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS), SETTINGS_REQUEST_CODE);
+                    }
+                }).create().show();
     }
 
     private boolean gpsActived(){
@@ -250,8 +190,7 @@ public class MapDriverActivity extends AppCompatActivity implements OnMapReadyCa
     private void disconnect(){
 
         if (mFusedLocation != null){
-            mButtonConnect.setText("Conectarse");
-            mIsConnect = false;
+
             mFusedLocation.removeLocationUpdates(mLocationCallback);
             if (mAuthProvider.existSession()) {
                 mGeofireProvider.removeLocation(mAuthProvider.getId());
@@ -267,8 +206,6 @@ public class MapDriverActivity extends AppCompatActivity implements OnMapReadyCa
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 if (gpsActived()){
-                    mButtonConnect.setText("Desconectarse");
-                    mIsConnect = true;
                     mFusedLocation.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
                 }else {
                     showAlertDialogNOGPS();
@@ -297,44 +234,16 @@ public class MapDriverActivity extends AppCompatActivity implements OnMapReadyCa
                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                ActivityCompat.requestPermissions(MapDriverActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_REQUEST_CODE);
+                                ActivityCompat.requestPermissions(MapDriverBookingActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_REQUEST_CODE);
                             }
                         })
                         .create()
                         .show();
             }
             else{
-                ActivityCompat.requestPermissions(MapDriverActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_REQUEST_CODE);
+                ActivityCompat.requestPermissions(MapDriverBookingActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_REQUEST_CODE);
             }
         }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-
-        getMenuInflater().inflate(R.menu.driver_menu, menu);
-
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if(item.getItemId() == R.id.action_logout){
-            logout();
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    void logout(){
-        disconnect();
-        mAuthProvider.logout();
-        Intent intent = new Intent(MapDriverActivity.this, MainActivity.class);
-        startActivity(intent);
-        finish();
-    }
-
-    void generateToken(){
-        mTokenProvider.create(mAuthProvider.getId());
     }
 
 }

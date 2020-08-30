@@ -3,7 +3,7 @@ package com.pm.pi_mg.models;
 import java.util.ArrayList;
 
 public class FCMResponse {
-    private int multicast_id;
+    private long multicast_id;
     private int success;
     private int failure;
     private int canonical_ids;
@@ -17,7 +17,7 @@ public class FCMResponse {
         this.results = results;
     }
 
-    public int getMulticast_id() {
+    public long getMulticast_id() {
         return multicast_id;
     }
 
