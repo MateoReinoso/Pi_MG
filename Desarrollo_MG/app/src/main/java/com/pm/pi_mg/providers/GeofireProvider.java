@@ -23,6 +23,11 @@ public class GeofireProvider {
 
     public void removeLocation(String idDriver){mGeofire.removeLocation(idDriver);}
 
+    public DatabaseReference getDriverLocation(String idDriver){
+        return mDatabase.child(idDriver).child("l");
+    }
+
+
     public GeoQuery getActiveDrivers(LatLng latLng, double radius){
         GeoQuery geoQuery = mGeofire.queryAtLocation(new GeoLocation(latLng.latitude, latLng.longitude), radius);
         geoQuery.removeAllListeners();

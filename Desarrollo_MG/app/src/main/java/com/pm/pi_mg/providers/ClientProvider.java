@@ -24,4 +24,8 @@ public class ClientProvider {
         return mDatabase.child(client.getId()).setValue(map);
     }
 
+    public DatabaseReference  getClient(String idClient){
+        return mDatabase.child(idClient);
+    }
+
 }
