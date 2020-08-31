@@ -9,6 +9,8 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -63,7 +65,7 @@ public class MapClientBookingActivity extends AppCompatActivity implements OnMap
     private ClientBookingProvider mClientBookingProvider;
     private DriverProvider mDriverProvider;
 
-
+    private Button mButtonFinishBooking;
 
     private Marker mMarkerDriver;
     private boolean mIsFirstTime = true;
@@ -101,6 +103,9 @@ public class MapClientBookingActivity extends AppCompatActivity implements OnMap
         mGoogleApiProvider = new GoogleApiProvider(MapClientBookingActivity.this);
         mDriverProvider = new DriverProvider();
 
+        mButtonFinishBooking = findViewById(R.id.btnFinish);
+
+
         mMapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mMapFragment.getMapAsync(this);
 
@@ -113,7 +118,21 @@ public class MapClientBookingActivity extends AppCompatActivity implements OnMap
         mTextViewDestinationClientBooking = findViewById(R.id.textViewDestinationDriverBooking);
 
         getClientBooking();
+
+
+        mButtonFinishBooking.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finishBooking();
+                finish();
+            }
+        });
     }
+
+    private void finishBooking() {
+    }
+
+
 
     @Override
     protected void onDestroy() {

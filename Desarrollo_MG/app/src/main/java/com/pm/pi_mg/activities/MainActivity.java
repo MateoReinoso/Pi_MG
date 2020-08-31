@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
         mPref = getApplicationContext().getSharedPreferences("typeUser", MODE_PRIVATE);
         final SharedPreferences.Editor editor = mPref.edit();
 

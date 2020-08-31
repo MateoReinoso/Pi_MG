@@ -20,6 +20,7 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -86,6 +87,7 @@ public class MapDriverBookingActivity extends AppCompatActivity implements OnMap
     private GoogleApiProvider mGoogleApiProvider;
     private List<LatLng> mPolylineList;
     private PolylineOptions mPolylineOptions;
+    private Button mButtonFinishBooking;
 
     private Marker mMarker;
 
@@ -149,6 +151,7 @@ public class MapDriverBookingActivity extends AppCompatActivity implements OnMap
         mTextViewClientBooking = findViewById(R.id.textViewClientBooking);
         mTextViewEmailClientBooking = findViewById(R.id.textViewEmailClientBooking);
         mTextViewDestinationClientBooking = findViewById(R.id.textViewDestinationClientBooking);
+        mButtonFinishBooking = findViewById(R.id.btnFinish);
 
         mFusedLocation = LocationServices.getFusedLocationProviderClient(this);
 
@@ -159,6 +162,18 @@ public class MapDriverBookingActivity extends AppCompatActivity implements OnMap
         mGoogleApiProvider = new GoogleApiProvider(MapDriverBookingActivity.this);
         getClient();
 
+        mButtonFinishBooking.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finishBooking();
+
+            }
+        });
+
+    }
+
+    private void finishBooking() {
+        finish();
     }
 
     private void getClientBooking() {
