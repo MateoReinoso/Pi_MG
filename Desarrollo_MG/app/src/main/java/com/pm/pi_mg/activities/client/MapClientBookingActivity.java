@@ -14,10 +14,12 @@ import android.widget.TextView;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.JointType;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -34,6 +36,7 @@ import com.pm.pi_mg.R;
 import com.pm.pi_mg.activities.driver.MapDriverBookingActivity;
 import com.pm.pi_mg.providers.AuthProvider;
 import com.pm.pi_mg.providers.ClientBookingProvider;
+import com.pm.pi_mg.providers.DriverProvider;
 import com.pm.pi_mg.providers.GeofireProvider;
 import com.pm.pi_mg.providers.GoogleApiProvider;
 import com.pm.pi_mg.providers.TokenProvider;
@@ -58,6 +61,8 @@ public class MapClientBookingActivity extends AppCompatActivity implements OnMap
     private GeofireProvider mGeofireProvider;
     private TokenProvider mTokenProvider;
     private ClientBookingProvider mClientBookingProvider;
+    private DriverProvider mDriverProvider;
+
 
 
     private Marker mMarkerDriver;
@@ -81,6 +86,9 @@ public class MapClientBookingActivity extends AppCompatActivity implements OnMap
     private List<LatLng> mPolylineList;
     private PolylineOptions mPolylineOptions;
 
+    private ValueEventListener mListener;
+    private String mIdDriver;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,6 +99,7 @@ public class MapClientBookingActivity extends AppCompatActivity implements OnMap
         mTokenProvider = new TokenProvider();
         mClientBookingProvider = new ClientBookingProvider();
         mGoogleApiProvider = new GoogleApiProvider(MapClientBookingActivity.this);
+        mDriverProvider = new DriverProvider();
 
         mMapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mMapFragment.getMapAsync(this);
@@ -106,6 +115,14 @@ public class MapClientBookingActivity extends AppCompatActivity implements OnMap
         getClientBooking();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mListener != null){
+            mGeofireProvider.getDriverLocation(mIdDriver).removeEventListener(mListener);
+        }
+    }
+
     private void getClientBooking() {
         mClientBookingProvider.getClientBooking(mAuthProvider.getId()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -114,6 +131,7 @@ public class MapClientBookingActivity extends AppCompatActivity implements OnMap
                     String destination = dataSnapshot.child("destination").getValue().toString();
                     String origin = dataSnapshot.child("origin").getValue().toString();
                     String idDriver = dataSnapshot.child("idDriver").getValue().toString();
+                    mIdDriver = idDriver;
                     double destinationLat = Double.parseDouble(dataSnapshot.child("destinationLat").getValue().toString());
                     double destinationLng = Double.parseDouble(dataSnapshot.child("destinationLng").getValue().toString());
                     double originLat = Double.parseDouble(dataSnapshot.child("originLat").getValue().toString());
@@ -122,6 +140,7 @@ public class MapClientBookingActivity extends AppCompatActivity implements OnMap
                     mDestinationLatLng = new LatLng(destinationLat,destinationLng);
                     mTextViewDestinationClientBooking.setText("Lugar de entrega: " +destination);
                     mMap.addMarker(new MarkerOptions().position(mDestinationLatLng).title("Entregar Aqui").icon(BitmapDescriptorFactory.fromResource(R.drawable.icon_pin_blue)));
+                    getDriver(idDriver);
                     getDriverLocation(idDriver);
 
                 }
@@ -133,8 +152,28 @@ public class MapClientBookingActivity extends AppCompatActivity implements OnMap
         });
     }
 
+    private void getDriver(String idDriver) {
+        mDriverProvider.getDriver(idDriver).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()){
+                    String name = dataSnapshot.child("name").getValue().toString();
+                    String email = dataSnapshot.child("email").getValue().toString();
+                    mTextViewClientBooking.setText(name);
+                    mTextViewEmailClientBooking.setText(email);
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
     private void getDriverLocation(String idDriver) {
-        mGeofireProvider.getDriverLocation(idDriver).addValueEventListener(new ValueEventListener() {
+        mListener = mGeofireProvider.getDriverLocation(idDriver).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()){
@@ -150,6 +189,12 @@ public class MapClientBookingActivity extends AppCompatActivity implements OnMap
                             .icon(BitmapDescriptorFactory.fromResource(R.drawable.icons8_cami_n_30)));
                     if (mIsFirstTime){
                         mIsFirstTime = false;
+                        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(
+                                new CameraPosition.Builder()
+                                        .target(mDriverLatLng)
+                                        .zoom(13f)
+                                        .build()
+                        ));
                         drawRoute();
                     }
 
